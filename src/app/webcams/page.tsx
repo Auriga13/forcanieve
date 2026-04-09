@@ -15,7 +15,7 @@ interface WebcamGroup {
     id: string;
     name: string;
     embedUrl: string;
-    type: "img" | "iframe";
+    type: "img" | "iframe" | "page";
     source: string | null;
   }[];
 }
@@ -40,7 +40,7 @@ export default async function WebcamsPage() {
       id: row.id,
       name: row.name,
       embedUrl: row.embed_url,
-      type: row.thumbnail_url === "iframe" ? "iframe" : "img",
+      type: (row.thumbnail_url === "iframe" ? "iframe" : row.thumbnail_url === "page" ? "page" : "img") as "img" | "iframe" | "page",
       source: row.source,
     });
   }
@@ -77,6 +77,21 @@ export default async function WebcamsPage() {
                             allow="autoplay"
                             loading="lazy"
                           />
+                        ) : cam.type === "page" ? (
+                          <a
+                            href={cam.embedUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex flex-col items-center justify-center gap-2 w-full h-full hover:bg-gray-50 transition-colors"
+                          >
+                            <Camera className="h-10 w-10 text-sky-500" />
+                            <span className="text-sm font-medium text-sky-600">
+                              Ver webcams en directo
+                            </span>
+                            <span className="text-xs text-muted-foreground">
+                              Se abre en {cam.source}
+                            </span>
+                          </a>
                         ) : (
                           /* eslint-disable-next-line @next/next/no-img-element */
                           <img
