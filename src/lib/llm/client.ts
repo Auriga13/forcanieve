@@ -1,13 +1,13 @@
-import Anthropic from "@anthropic-ai/sdk";
+import Groq from "groq-sdk";
 
-const MODEL_ID = "claude-haiku-4-5-20251001";
+const MODEL_ID = "llama-3.3-70b-versatile";
 const MAX_TOKENS = 500;
 
-let client: Anthropic | null = null;
+let client: Groq | null = null;
 
-function getClient(): Anthropic {
+function getClient(): Groq {
   if (!client) {
-    client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+    client = new Groq({ apiKey: process.env.GROQ_API_KEY });
   }
   return client;
 }
@@ -16,15 +16,17 @@ export async function generateSummary(
   systemPrompt: string,
   userPrompt: string
 ): Promise<string> {
-  const anthropic = getClient();
+  const groq = getClient();
 
-  const response = await anthropic.messages.create({
+  const response = await groq.chat.completions.create({
     model: MODEL_ID,
     max_tokens: MAX_TOKENS,
-    system: systemPrompt,
-    messages: [{ role: "user", content: userPrompt }],
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: userPrompt },
+    ],
+    temperature: 0.3,
   });
 
-  const textBlock = response.content.find((b) => b.type === "text");
-  return textBlock?.text ?? "";
+  return response.choices[0]?.message?.content ?? "";
 }

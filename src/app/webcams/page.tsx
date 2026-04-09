@@ -15,6 +15,7 @@ interface WebcamGroup {
     id: string;
     name: string;
     embedUrl: string;
+    type: "img" | "iframe";
     source: string | null;
   }[];
 }
@@ -39,6 +40,7 @@ export default async function WebcamsPage() {
       id: row.id,
       name: row.name,
       embedUrl: row.embed_url,
+      type: row.thumbnail_url === "iframe" ? "iframe" : "img",
       source: row.source,
     });
   }
@@ -67,13 +69,23 @@ export default async function WebcamsPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={cam.embedUrl}
-                          alt={`Webcam: ${cam.name}`}
-                          className="w-full h-full object-cover"
-                          loading="lazy"
-                        />
+                        {cam.type === "iframe" ? (
+                          <iframe
+                            src={cam.embedUrl}
+                            title={`Webcam: ${cam.name}`}
+                            className="w-full h-full"
+                            allow="autoplay"
+                            loading="lazy"
+                          />
+                        ) : (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            src={cam.embedUrl}
+                            alt={`Webcam: ${cam.name}`}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        )}
                       </div>
                       {cam.source && (
                         <p className="text-xs text-muted-foreground mt-2">
